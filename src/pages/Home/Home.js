@@ -5,8 +5,11 @@ import { usePeopleFetch } from "hooks";
 import * as S from "./style";
 
 const Home = () => {
-  const { users, isLoading } = usePeopleFetch();
+  const { users, isLoading , fetchUsers} = usePeopleFetch();
 
+  const fetchAgain = () => {
+    fetchUsers();
+  }
   return (
     <S.Home>
       <S.Content>
@@ -15,7 +18,7 @@ const Home = () => {
             PplFinder
           </Text>
         </S.Header>
-        <UserList users={users} isLoading={isLoading} />
+        <UserList users={users} isLoading={isLoading} onFetch={fetchAgain}/>
       </S.Content>
     </S.Home>
   );

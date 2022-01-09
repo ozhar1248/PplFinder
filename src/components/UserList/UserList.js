@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Text from "components/Text";
 import Spinner from "components/Spinner";
 import CheckBox from "components/CheckBox";
@@ -6,9 +6,13 @@ import IconButton from "@material-ui/core/IconButton";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import * as S from "./style";
 
-const UserList = ({ users, isLoading }) => {
+const UserList = ({ users, isLoading, onFetch }) => {
   const [hoveredUserId, setHoveredUserId] = useState();
   const [selectedCountries, setSelectedCountries] = useState([]);
+  const [favorites, setFavorites] = useState(
+    JSON.parse(localStorage.getItem("favorites") || "[]")
+  );
+  const [allUsers, setAllUsers] = useState([]);
 
   const handleMouseEnter = (index) => {
     setHoveredUserId(index);
@@ -63,11 +67,38 @@ const UserList = ({ users, isLoading }) => {
     return Boolean(countriesFiltered.find((item) => item.label === country));
   };
 
+  const isInFavorites = (user) => {
+    return Boolean(favorites.find((item) => item.email === user.email));
+  };
+
+  const handleFavClick = (user) => {
+    if (isInFavorites(user)) {
+      setFavorites((prevList) =>
+        prevList.filter((userItem) => userItem.email !== user.email)
+      );
+    } else {
+      setFavorites((prevList) => [...prevList, user]);
+    }
+  };
+
+  useEffect(() => {
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    setAllUsers((prevList) => [...prevList, ...users]);
+  }, [favorites, users]);
+
+  const PRECISION = 0.5;
+  const handleScroll = (e) => {
+    const diff = e.target.scrollHeight - e.target.scrollTop - e.target.clientHeight;
+    if (Math.abs(diff) <= PRECISION) {
+      onFetch();
+    }
+  };
+
   return (
     <S.UserList>
       <S.Filters>{checkBoxElements}</S.Filters>
-      <S.List>
-        {users
+      <S.List onScroll={handleScroll}>
+        {allUsers
           .filter(
             (user) =>
               isInSelectedCountries(user.location.country) ||
@@ -93,7 +124,12 @@ const UserList = ({ users, isLoading }) => {
                     {user?.location.city} {user?.location.country}
                   </Text>
                 </S.UserInfo>
-                <S.IconButtonWrapper isVisible={index === hoveredUserId}>
+                <S.IconButtonWrapper
+                  isVisible={index === hoveredUserId || isInFavorites(user)}
+                  onClick={() => {
+                    handleFavClick(user);
+                  }}
+                >
                   <IconButton>
                     <FavoriteIcon color="error" />
                   </IconButton>
