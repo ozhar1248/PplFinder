@@ -77,6 +77,7 @@ const UserList = ({ users, isLoading, onFetch }) => {
         prevList.filter((userItem) => userItem.email !== user.email)
       );
     } else {
+      
       setFavorites((prevList) => [...prevList, user]);
     }
   };
@@ -84,9 +85,13 @@ const UserList = ({ users, isLoading, onFetch }) => {
   useEffect(() => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
     setAllUsers((prevList) => [...prevList, ...users]);
-  }, [favorites, users]);
+  }, [users]);
 
-  const PRECISION = 0.5;
+  useEffect(() => {
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+  }, [favorites]);
+
+  const PRECISION = 0.4;
   const handleScroll = (e) => {
     const diff = e.target.scrollHeight - e.target.scrollTop - e.target.clientHeight;
     if (Math.abs(diff) <= PRECISION) {
