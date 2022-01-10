@@ -3,7 +3,7 @@
   "version": "1.0.7",
   "bin": "./bin/cli.js",
   "license": "MIT",
-  "homepage": "http://ozhar1248.github.io/PplFinder",
+  "homepage": "/",
   "repository": "https://github.com/powerlink/PplFinder",
   "dependencies": {
     "@material-ui/core": "^4.12.3",
